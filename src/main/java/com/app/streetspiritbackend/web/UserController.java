@@ -5,6 +5,7 @@ import com.app.streetspiritbackend.models.bindingModels.UserLoginBindModel;
 import com.app.streetspiritbackend.models.bindingModels.UserRegistrationBindModel;
 import com.app.streetspiritbackend.models.entities.User;
 import com.app.streetspiritbackend.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,22 +38,18 @@ public class UserController {
 
 
     @PostMapping(path = "/register", consumes = "application/json")
-    public String registerAndLoginUser(@Valid @RequestBody UserRegistrationBindModel user) {
+    public ResponseEntity<String> registerUser(@Valid @RequestBody UserRegistrationBindModel user) {
 
-        userService.registerAndLoginUser(user);
-
-        return "User was created";
+        return userService.registerUser(user);
     }
 
 
     @PostMapping(path = "/login", consumes = "application/json")
-    public String loginUser(@RequestBody UserLoginBindModel user) {
+    public ResponseEntity<String> loginUser(@RequestBody UserLoginBindModel user) {
 
-        userService.loginUser(user);
+        return userService.loginUser(user);
 
-        return "user was logged in";
     }
-
 
 
 //    @PostMapping(path = "/logout")

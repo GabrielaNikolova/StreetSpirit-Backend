@@ -11,6 +11,8 @@ import com.app.streetspiritbackend.repositories.UserRepo;
 import com.app.streetspiritbackend.services.RoleService;
 import com.app.streetspiritbackend.services.UserService;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,8 +43,12 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public void registerAndLoginUser(UserRegistrationBindModel userBindModel) {
+    public ResponseEntity<String> registerUser(UserRegistrationBindModel userBindModel) {
         UserRegistrationServModel userRegistrationServModel = modelMapper.map(userBindModel, UserRegistrationServModel.class);
+
+        if (getByUsername(userRegistrationServModel.getUsername()) != null) {
+            return new ResponseEntity<>("Email is already taken!", HttpStatus.BAD_REQUEST);
+        }
         User newUser = modelMapper.map(userRegistrationServModel, User.class);
         newUser.setPassword(passwordEncoder.encode(userRegistrationServModel.getPassword()));
 
@@ -52,12 +58,16 @@ public class UserServiceImpl implements UserService {
 
         List<Order> userOrders = new ArrayList<>();
         newUser.setOrders(userOrders);
-
         userRepo.save(newUser);
+        return new ResponseEntity<>("User was registered successfully", HttpStatus.OK);
     }
 
     @Override
-    public void loginUser(UserLoginBindModel user) {
+    public ResponseEntity<String> loginUser(UserLoginBindModel user) {
+        if (getByUsername(user.getUsername())== null){
+            return new ResponseEntity<>("User with email " + user.getUsername() + " not found.", HttpStatus.BAD_REQUEST);
+        }
+
         UserDetails principal = userDetailsAppService.loadUserByUsername(user.getUsername());
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -67,12 +77,14 @@ public class UserServiceImpl implements UserService {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+        return new ResponseEntity<>("User signed-in successfully!.", HttpStatus.OK);
     }
+
 
     @Override
     public User getByUsername(String email) {
         return userRepo.findByUsername(email)
-                .orElseThrow(()->new UsernameNotFoundException("User with email " + email + " not found."));
+                .orElseThrow(() -> new UsernameNotFoundException("User with email " + email + " not found."));
     }
 
     @Override

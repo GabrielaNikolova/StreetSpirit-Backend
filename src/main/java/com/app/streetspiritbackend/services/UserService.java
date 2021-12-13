@@ -5,13 +5,14 @@ import com.app.streetspiritbackend.models.bindingModels.UserRegistrationBindMode
 import com.app.streetspiritbackend.models.entities.Order;
 import com.app.streetspiritbackend.models.entities.User;
 import com.app.streetspiritbackend.models.serviceModels.UserRegistrationServModel;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface UserService {
 
-    void registerAndLoginUser(UserRegistrationBindModel userBindModel);
-    void loginUser(UserLoginBindModel userLoginBindModel);
+    ResponseEntity<String> registerUser(UserRegistrationBindModel userBindModel);
+    ResponseEntity<String> loginUser(UserLoginBindModel userLoginBindModel);
 
     User getByUsername(String email);
 
