@@ -29,3 +29,6 @@ server:
   port: 8080
   error:
     path: /error
+    whitelabel:
+      enabled: false
+    include-message: always
